@@ -1,5 +1,4 @@
-variable "ambiente" {
+variable "nome" {
   description = "Nome do ambiente"
   type        = string
-  default     = "desenvolvimento"
 }

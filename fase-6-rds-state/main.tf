@@ -7,8 +7,8 @@
 #     1. Falta "encrypt = true" (o state guarda segredos e precisa ser encriptado)
 #     2. Falta "dynamodb_table" para o state locking (prevenir conflitos)
 #   RDS (aws_db_instance):
-#     3. "publicly_accessible = true" — o banco NÃO pode ser público
-#     4. "storage_encrypted = false" — o armazenamento deve ser encriptado
+#     3. "publicly_accessible = false" — o banco NÃO pode ser público
+#     4. "storage_encrypted = true" — o armazenamento deve ser encriptado
 #     5. Falta "db_subnet_group_name" — o RDS deve ficar nas subnets privadas
 #
 # Esta fase é validada por terraform validate + análise do código (não aplica na AWS).
@@ -27,8 +27,8 @@ terraform {
     bucket = "technova-terraform-state"
     key    = "fase6/terraform.tfstate"
     region = "us-east-1"
-    # ❌ falta encrypt = true
-    # ❌ falta dynamodb_table = "..."
+    encrypt        = true
+    dynamodb_table = "technova-terraform-locks"
   }
 }
 
@@ -58,12 +58,14 @@ resource "aws_db_instance" "technova" {
   password = var.db_password
 
   # ❌ banco exposto para a internet
-  publicly_accessible = true
+  publicly_accessible = false
 
   # ❌ armazenamento sem encriptação
-  storage_encrypted = false
+  storage_encrypted = true
 
   # ❌ falta db_subnet_group_name (banco deve ficar em subnets privadas)
+
+  db_subnet_group_name = "technova-db-subnets"
 
   skip_final_snapshot = true
 
